@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark theme colors — matching TRADEX AUTO Pro extension design -->
+    <color name="primary">#1A1A2E</color>
+    <color name="primary_dark">#0D0D1A</color>
+    <color name="accent">#00E5FF</color>
+    <color name="background">#0D0D1A</color>
+    <color name="surface">#16213E</color>
+    <color name="error">#FF1744</color>
+    <color name="on_primary">#FFFFFF</color>
+
+    <!-- Splash -->
+    <color name="splash_background">#0D0D1A</color>
+
+    <!-- Progress Bar -->
+    <color name="progress_bar">#00E5FF</color>
+
+    <!-- Offline Page -->
+    <color name="offline_background">#111827</color>
+    <color name="offline_text">#E0E0E0</color>
+</resources>

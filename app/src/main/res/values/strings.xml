@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TRADEX AUTO</string>
+    <string name="version_text">v1.0.0</string>
+
+    <!-- Offline -->
+    <string name="offline_title">No Internet</string>
+    <string name="offline_message">You are offline.\nCheck your connection and try again.</string>
+    <string name="retry">Retry</string>
+    <string name="no_internet">No internet connection available</string>
+
+    <!-- Extension -->
+    <string name="extension_options">Extension Options</string>
+    <string name="extension_popup">TRADEX AUTO</string>
+</resources>

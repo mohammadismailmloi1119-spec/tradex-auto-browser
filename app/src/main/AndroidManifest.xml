@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Minimal permissions: Internet + Network state only -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <application
+        android:name=".KioskApplication"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="TRADEX AUTO"
+        android:largeHeap="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.KioskBrowser"
+        tools:targetApi="34">
+
+        <!-- Splash screen activity → launched first -->
+        <activity
+            android:name=".ui.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.KioskBrowser.Splash"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize|density"
+            android:windowSoftInputMode="adjustResize">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Handle chrome-extension:// for extension pages -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="chrome-extension" />
+            </intent-filter>
+        </activity>
+
+        <!-- Main kiosk browser activity (single instance, full screen) -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize|density"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.KioskBrowser" />
+
+        <!-- Extension popup (dialog-style) -->
+        <activity
+            android:name=".ui.ExtensionPopupActivity"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/Theme.KioskBrowser.ExtensionPopup" />
+
+        <!-- Extension launcher page (full-screen, for TRADEX AUTO launcher.html) -->
+        <activity
+            android:name=".ui.ExtensionLauncherActivity"
+            android:exported="false"
+            android:launchMode="standard"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.KioskBrowser" />
+
+        <!-- Extension options page -->
+        <activity
+            android:name=".ui.ExtensionOptionsActivity"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/Theme.KioskBrowser" />
+
+        <!-- Safe Browsing enabled -->
+        <meta-data
+            android:name="android.webkit.WebView.EnableSafeBrowsing"
+            android:value="true" />
+
+    </application>
+</manifest>

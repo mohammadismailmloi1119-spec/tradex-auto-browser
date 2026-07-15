@@ -1,0 +1,884 @@
+/* ═══════════════════════════════════════════════════════
+   Auto TradeX Pro — content.css
+   ═══════════════════════════════════════════════════════ */
+
+#wingo-ab-panel {
+  position: fixed;
+  top: 60px;
+  right: 10px;
+  width: 250px;
+  min-width: 200px;
+  min-height: 280px;
+  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 100%);
+  border: 6px solid transparent;
+  outline: 4px solid transparent;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,107,53,0.1);
+  z-index: 2147483647;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 12px;
+  color: #fff;
+  user-select: none;
+  touch-action: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.2s, height 0.2s, border-radius 0.2s;
+}
+#wingo-ab-panel.hidden { display: none !important; }
+#wingo-ab-panel * { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Minimized ball ───────────────────────────────────── */
+#wingo-ab-panel.minimized {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: unset !important;
+  min-height: unset !important;
+  border-radius: 50% !important;
+  border: 2px solid rgba(240,180,41,0.9); /* RKN gold */
+  overflow: visible !important; /* allow ping badge ripple to extend outside */
+  animation: wab-ring-pulse 2.5s ease-in-out infinite;
+}
+@keyframes wab-ring-pulse {
+  /* Gold ring pulsing — matches RKN logo gold (#f0b429) and navy (#0d1b2e) */
+  0%,100% {
+    box-shadow: 0 4px 16px rgba(240,180,41,0.4), 0 0 0 3px rgba(240,180,41,0.15);
+    border-color: rgba(240,180,41,0.85);
+  }
+  40% {
+    box-shadow: 0 10px 28px rgba(240,180,41,0.75), 0 0 0 7px rgba(240,180,41,0.28);
+    border-color: rgba(240,180,41,1);
+  }
+  60% {
+    box-shadow: 0 8px 22px rgba(240,180,41,0.6), 0 0 0 5px rgba(240,180,41,0.22);
+    border-color: rgba(240,180,41,0.95);
+  }
+}
+#wab-ball {
+  display: none;
+  position: relative; /* anchor ping badge pseudo-elements */
+  width: 100%; height: 100%;
+  align-items: center; justify-content: center;
+  font-size: 0; /* hide the ⚡ emoji — logo replaces it */
+  cursor: grab;
+  background-color: #0d1b2e;
+  background-image: none; /* set by JS via chrome.runtime.getURL */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 50%;
+  animation: wab-ball-bounce 2s ease-in-out infinite;
+  transition: filter 0.15s;
+  overflow: hidden; /* clip image to circle */
+}
+/* whileHover → scale 1.1 (via brightness since animation owns transform) */
+#wab-ball:hover  { filter: brightness(1.18); cursor: grab; }
+/* whileTap  → scale 0.9 */
+#wab-ball:active { filter: brightness(0.82) saturate(1.4); cursor: grabbing; }
+
+/* Pulsing notification ping badge — expanding sky-blue ripple (animate-ping) */
+#wab-ball::before {
+  content: '';
+  position: absolute;
+  top: 2px; right: 2px;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: rgba(56,189,248,0.75); /* sky-400 */
+  animation: wab-ping 2s ease-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+/* Solid inner dot sitting on top of the ripple */
+#wab-ball::after {
+  content: '';
+  position: absolute;
+  top: 5px; right: 5px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #0ea5e9; /* sky-500 */
+  pointer-events: none;
+  z-index: 2;
+}
+@keyframes wab-ping {
+  0%        { transform: scale(1);   opacity: 0.75; }
+  75%, 100% { transform: scale(2.2); opacity: 0;    }
+}
+@keyframes wab-ball-bounce {
+  0%,100% {
+    transform: translateY(0px) scale(1);
+    box-shadow: 0 4px 10px rgba(255,107,53,0.5);
+  }
+  40% {
+    transform: translateY(-8px) scale(1.08);
+    box-shadow: 0 12px 22px rgba(255,107,53,0.85);
+  }
+  60% {
+    transform: translateY(-6px) scale(1.05);
+    box-shadow: 0 10px 18px rgba(255,107,53,0.75);
+  }
+}
+
+/* ── Full panel content ───────────────────────────────── */
+#wab-panel-content {
+  position: relative; /* anchor for gate overlay */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Header ───────────────────────────────────────────── */
+#wab-header {
+  position: relative;  /* float above gate overlay (z-index 9000) */
+  z-index: 9001;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px 5px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  cursor: grab;
+  border-radius: 14px 14px 0 0;
+  background: rgba(255,107,53,0.08);
+  flex-shrink: 0;
+}
+#wab-header:active { cursor: grabbing; }
+.wab-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ff6b35;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+.wab-title span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wab-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #555;
+  flex-shrink: 0;
+}
+.wab-dot.active {
+  background: #4ade80;
+  box-shadow: 0 0 7px #4ade80;
+  animation: wab-pulse 1.5s infinite;
+}
+@keyframes wab-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+#wab-header-btns { display: flex; gap: 4px; flex-shrink: 0; }
+#wab-header-btns button {
+  background: rgba(255,255,255,0.07);
+  border: none; color: #aaa;
+  width: 22px; height: 22px;
+  border-radius: 5px; cursor: pointer;
+  font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+#wab-header-btns button:hover { background: rgba(255,107,53,0.25); color: #ff6b35; }
+
+/* ── Navigation tabs ──────────────────────────────────── */
+#wab-nav {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: rgba(0,0,0,0.2);
+}
+.wab-nav-btn {
+  flex: 1;
+  padding: 6px 2px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: all 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.wab-nav-btn.active {
+  color: #ff6b35;
+  border-bottom: 2px solid #ff6b35;
+  background: rgba(255,107,53,0.08);
+}
+.wab-nav-btn:hover:not(.active) { color: #aaa; }
+
+/* ── Pages ────────────────────────────────────────────── */
+.wab-page {
+  flex: 1 1 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 5px 8px 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #333 transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 0;
+}
+.wab-page > * { min-width: 0; width: 100%; flex-shrink: 0; }
+
+/* ── Status grid (2×2) ────────────────────────────────── */
+.wab-status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.wab-stat-cell {
+  background: rgba(255,255,255,0.03);
+  border-radius: 5px;
+  padding: 4px 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.wab-stat-lbl {
+  font-size: 9px;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wab-status-val {
+  font-weight: 700;
+  font-size: 11px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wab-status-val.green  { color: #4ade80; }
+.wab-status-val.red    { color: #f87171; }
+.wab-status-val.yellow { color: #facc15; }
+
+/* ── Level display ────────────────────────────────────── */
+#wab-level-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(74,222,128,0.1);
+  border: 1px solid rgba(74,222,128,0.25);
+  color: #4ade80;
+  margin-bottom: 3px;
+  text-align: center;
+  word-break: break-word;
+  min-width: 0;
+}
+#wab-level-badge.hot {
+  background: rgba(251,146,60,0.15);
+  border-color: rgba(251,146,60,0.4);
+  color: #fb923c;
+  animation: wab-pulse 1s infinite;
+}
+.wab-level-preview {
+  font-size: 9px;
+  color: #444;
+  text-align: center;
+  margin-bottom: 4px;
+  white-space: normal;
+  word-break: break-word;
+  min-width: 0;
+}
+
+/* ── Strategy section ─────────────────────────────────── */
+#wab-strat-section {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 7px;
+  padding: 5px 8px;
+  margin-bottom: 4px;
+}
+.wab-strat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3px;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.wab-section-title {
+  font-size: 10px; color: #555;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  flex-shrink: 0;
+}
+.wab-section-label {
+  font-size: 9px; color: #555;
+  text-transform: uppercase; letter-spacing: 0.7px;
+  margin-bottom: 3px;
+}
+.wab-lock-btn {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 5px;
+  color: #888; font-size: 10px;
+  padding: 3px 8px; cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.wab-lock-btn:hover { background: rgba(255,107,53,0.15); color: #ff6b35; border-color: rgba(255,107,53,0.4); }
+
+/* Password row */
+.wab-pw-row {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.wab-pw-btn {
+  background: rgba(255,107,53,0.2);
+  border: 1px solid rgba(255,107,53,0.4);
+  border-radius: 6px; color: #ff6b35;
+  font-size: 11px; padding: 6px 10px;
+  cursor: pointer; white-space: nowrap;
+  flex-shrink: 0;
+}
+.wab-pw-btn.cancel {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.1);
+  color: #888;
+}
+.wab-pw-error {
+  font-size: 11px; color: #f87171;
+  margin-bottom: 5px;
+  padding: 3px 5px;
+}
+
+/* S1 row */
+.wab-s1-row {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 4px; margin-bottom: 2px;
+  flex-wrap: wrap;
+}
+.wab-result-bubble {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800;
+  flex-shrink: 0;
+}
+.wab-result-bubble.B { background: linear-gradient(135deg,#fb923c,#ea580c); color:#fff; box-shadow:0 2px 6px rgba(251,146,60,.4); }
+.wab-result-bubble.S { background: linear-gradient(135deg,#60a5fa,#2563eb); color:#fff; box-shadow:0 2px 6px rgba(96,165,250,.4); }
+.wab-result-bubble.empty { background:rgba(255,255,255,.05); color:#333; border:1px dashed rgba(255,255,255,.1); }
+.wab-arrow { color:#555; font-size:11px; flex-shrink: 0; }
+.wab-predict-bubble {
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:800;
+  border:2px solid transparent; flex-shrink:0;
+}
+.wab-predict-bubble.B { background:rgba(251,146,60,.18); border-color:#fb923c; color:#fb923c; box-shadow:0 0 8px rgba(251,146,60,.3); }
+.wab-predict-bubble.S { background:rgba(96,165,250,.18); border-color:#60a5fa; color:#60a5fa; box-shadow:0 0 8px rgba(96,165,250,.3); }
+.wab-predict-bubble.SKIP { background:rgba(255,255,255,.04); border-color:#444; color:#555; font-size:7px; }
+.wab-predict-bubble.wait { background:rgba(255,255,255,.04); border-color:#333; color:#444; font-size:8px; }
+/* Large variant for combined */
+.wab-predict-bubble.lg { width:36px; height:36px; font-size:13px; }
+
+/* S2 row */
+.wab-s2-row {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 4px;
+  flex-wrap: wrap;
+}
+.wab-s2-num {
+  min-width: 18px; text-align: center;
+  font-size: 12px; font-weight: 800; color: #e2e8f0;
+  background: rgba(255,255,255,0.07); border-radius: 4px; padding: 2px 3px;
+  flex-shrink: 0;
+}
+.wab-s2-op { font-size: 10px; color: #555; flex-shrink: 0; }
+.wab-s2-sum {
+  min-width: 18px; text-align: center;
+  font-size: 12px; font-weight: 800; border-radius: 4px; padding: 2px 3px;
+  flex-shrink: 0;
+}
+.wab-s2-sum.big   { color: #fb923c; background: rgba(251,146,60,0.15); }
+.wab-s2-sum.small { color: #60a5fa; background: rgba(96,165,250,0.15); }
+
+/* ── Combined prediction card ─────────────────────────── */
+.wab-combined-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 7px;
+  padding: 5px 8px;
+  margin-bottom: 4px;
+}
+.wab-combined-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 3px 0 2px;
+  flex-wrap: wrap;
+}
+.wab-match-label {
+  font-size: 10px; font-weight: 700;
+  color: #555;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wab-match-label.match   { color: #4ade80; }
+.wab-match-label.nomatch { color: #f87171; }
+.wab-hist-count {
+  font-size: 8px; color: #444;
+}
+
+/* ── Mini log on main page ────────────────────────────── */
+.wab-mini-log {
+  font-size: 9px;
+  color: #555;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  min-height: 12px;
+  overflow: hidden;
+}
+.wab-mini-log .log-bet  { color: #fb923c; }
+.wab-mini-log .log-win  { color: #4ade80; }
+.wab-mini-log .log-skip { color: #4b5563; }
+.wab-mini-log .log-stop { color: #f87171; }
+
+/* ── Main start/stop button ───────────────────────────── */
+.wab-main-btn {
+  width: 100%; padding: 9px;
+  border: none; border-radius: 8px;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; letter-spacing: 0.4px;
+  transition: opacity 0.2s, transform 0.1s;
+  flex-shrink: 0;
+  min-width: 0;
+}
+.wab-main-btn:active { transform: scale(0.97); }
+.wab-main-btn.start { background: linear-gradient(135deg,#22c55e,#16a34a); color:#fff; box-shadow:0 3px 12px rgba(34,197,94,.3); }
+.wab-main-btn.stop  { background: linear-gradient(135deg,#ef4444,#dc2626); color:#fff; box-shadow:0 3px 12px rgba(239,68,68,.3); }
+
+/* ── Settings page ────────────────────────────────────── */
+.wab-settings-title {
+  font-size: 14px; font-weight: 700;
+  color: #ff6b35; margin-bottom: 12px;
+}
+.wab-settings-group {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 10px 11px;
+  margin-bottom: 10px;
+  min-width: 0;
+}
+.wab-sg-label {
+  font-size: 11px; color: #555;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+/* Each row stacks label on top of input so nothing clips when narrow */
+.wab-input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.wab-input-row:last-child { margin-bottom: 0; }
+.wab-input-label {
+  color: #888; font-size: 12px;
+  font-weight: 600;
+  min-width: 0;
+}
+.wab-input {
+  width: 100%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 7px; color: #fff; font-size: 14px;
+  padding: 9px 11px; outline: none;
+  -webkit-appearance: none;
+  min-width: 0;
+}
+.wab-input:focus { border-color: rgba(255,107,53,0.7); background: rgba(255,107,53,0.05); }
+
+.wab-preview-box {
+  font-size: 11px; color: #fb923c;
+  background: rgba(251,146,60,0.08);
+  border: 1px solid rgba(251,146,60,0.2);
+  border-radius: 6px;
+  padding: 7px 9px;
+  margin-top: 8px;
+  white-space: normal;
+  word-break: break-all;
+  min-width: 0;
+}
+
+.wab-action-row {
+  display: flex; gap: 6px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.wab-action-btn {
+  flex: 1; min-width: 70px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 7px; color: #888;
+  font-size: 12px; padding: 9px 6px;
+  cursor: pointer; text-align: center;
+  transition: all 0.15s;
+  white-space: nowrap;
+  min-width: 0;
+}
+.wab-action-btn:hover { background: rgba(255,107,53,0.1); color: #ff6b35; border-color: rgba(255,107,53,0.3); }
+.wab-action-btn:active { transform: scale(0.98); }
+
+/* Save success message */
+.wab-save-success {
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  border-radius: 7px;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  color: #4ade80;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.wab-save-success-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Logs page ────────────────────────────────────────── */
+.wab-log-full {
+  background: rgba(0,0,0,0.35);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 11px;
+  color: #555;
+  line-height: 1.8;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 100px;
+  max-height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: #333 transparent;
+  word-break: break-word;
+  min-width: 0;
+}
+.wab-log-line { margin-bottom: 1px; word-break: break-word; }
+.wab-log-line.log-bet  { color: #fb923c; }
+.wab-log-line.log-win  { color: #4ade80; }
+.wab-log-line.log-skip { color: #4b5563; }
+.wab-log-line.log-stop { color: #f87171; }
+
+/* ── Resize handles ───────────────────────────────────── */
+.wab-resize {
+  position: absolute; z-index: 10;
+  background: transparent;
+}
+.wab-resize-se { bottom:0; right:0;   width:16px; height:16px; cursor:se-resize; border-radius:0 0 14px 0; }
+.wab-resize-sw { bottom:0; left:0;    width:16px; height:16px; cursor:sw-resize; border-radius:0 0 0 14px; }
+.wab-resize-ne { top:0;    right:0;   width:16px; height:16px; cursor:ne-resize; border-radius:0 14px 0 0; }
+.wab-resize-nw { top:0;    left:0;    width:16px; height:16px; cursor:nw-resize; border-radius:14px 0 0 0; }
+.wab-resize-e  { top:16px; right:0;   width:8px;  bottom:16px; cursor:e-resize; }
+.wab-resize-w  { top:16px; left:0;    width:8px;  bottom:16px; cursor:w-resize; }
+.wab-resize-s  { bottom:0; left:16px; height:8px; right:16px;  cursor:s-resize; }
+.wab-resize-n  { top:0;    left:16px; height:8px; right:16px;  cursor:n-resize; }
+
+/* ── Overlays (Gate & Auto-stop) ──────────────────────── */
+/*    Covers the full panel content including all pages.   */
+#wab-gate-overlay, .wab-gate-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  cursor: move;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(5, 8, 20, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 24px 20px;
+  text-align: center;
+  pointer-events: all;
+  transition: opacity 0.25s;
+}
+#wab-gate-overlay input, #wab-gate-overlay button,
+.wab-gate-overlay input, .wab-gate-overlay button {
+  cursor: default;
+}
+#wab-gate-overlay.hidden,
+#wingo-ab-panel.minimized #wab-gate-overlay,
+#wingo-ab-panel.minimized .wab-gate-overlay { 
+  display: none !important; 
+}
+
+/* When minimized to the ball, hide resize handles so they don't
+   intercept the tap that restores the panel. */
+#wingo-ab-panel.minimized .wab-resize { display: none !important; }
+
+.wab-gate-icon {
+  font-size: 30px;
+  line-height: 1;
+  animation: wab-gate-bounce 2s ease-in-out infinite;
+}
+@keyframes wab-gate-bounce {
+  0%,100% { transform: translateY(0) scale(1);    opacity: 0.85; }
+  50%      { transform: translateY(-6px) scale(1.1); opacity: 1; }
+}
+
+.wab-gate-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: #ff6b35;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(255,107,53,0.9), 0 2px 6px rgba(0,0,0,0.9);
+  line-height: 1.3;
+}
+
+.wab-gate-sub {
+  font-size: 11px;
+  color: #999;
+  line-height: 1.6;
+  max-width: 170px;
+}
+
+.wab-gate-arrow {
+  font-size: 20px;
+  color: #ff6b35;
+  opacity: 0.8;
+  animation: wab-gate-arrow 1.3s ease-in-out infinite;
+}
+@keyframes wab-gate-arrow {
+  0%,100% { transform: translateY(0);   opacity: 0.5; }
+  50%      { transform: translateY(6px); opacity: 1;   }
+}
+
+/* SE corner grip dots */
+.wab-resize-se::after {
+  content:''; position:absolute; bottom:4px; right:4px;
+  width:6px; height:6px;
+  background: radial-gradient(circle at 1px 1px, rgba(255,107,53,.5) 1px, transparent 1px),
+              radial-gradient(circle at 4px 1px, rgba(255,107,53,.5) 1px, transparent 1px),
+              radial-gradient(circle at 1px 4px, rgba(255,107,53,.5) 1px, transparent 1px),
+              radial-gradient(circle at 4px 4px, rgba(255,107,53,.5) 1px, transparent 1px);
+  background-size:6px 6px;
+  pointer-events:none;
+}
+
+/* ── Statistics boxes (Logs page) ──────────────────────── */
+.wab-stats-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.wab-stats-box {
+  flex: 1;
+  min-width: 70px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: 1.5px solid transparent;
+}
+
+.wab-stats-label {
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  opacity: 0.75;
+}
+
+.wab-stats-value {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Win boxes - green border */
+.wab-stats-box.wab-stats-win {
+  background: rgba(74, 222, 128, 0.08);
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+/* Loss boxes - red border */
+.wab-stats-box.wab-stats-loss {
+  background: rgba(248, 113, 113, 0.08);
+  border-color: #f87171;
+  color: #f87171;
+}
+
+/* Skip boxes - orange text */
+.wab-stats-box.wab-stats-skip {
+  background: rgba(251, 146, 60, 0.08);
+  border-color: rgba(251, 146, 60, 0.3);
+}
+
+.wab-stats-box.wab-stats-skip .wab-stats-label {
+  color: rgba(251, 146, 60, 0.7);
+}
+
+.wab-stats-box.wab-stats-skip .wab-stats-value {
+  color: #fb923c;
+}
+
+/* ── Risk summary card (Main page) ────────────────────── */
+.wab-risk-summary {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  justify-content: space-between;
+}
+
+.wab-risk-item {
+  font-size: 10px;
+  font-weight: 700;
+  color: #888;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px 6px;
+  border-radius: 4px;
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.wab-risk-item span {
+  color: #ff6b35;
+}
+
+/* ── Auto-stop overlay button ────────────────────────── */
+.wab-autostop-btn {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(74, 222, 128, 0.18);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  color: #4ade80;
+  font-weight: 600;
+  font-size: 11px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.wab-autostop-btn:hover {
+  background: rgba(74, 222, 128, 0.25);
+  border-color: rgba(74, 222, 128, 0.6);
+}
+
+.wab-autostop-btn:active {
+  transform: scale(0.95);
+}
+
+/* ── Overlay minimize button ── */
+.wab-overlay-min-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #aaa;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 10001;
+  line-height: 0;
+  padding-bottom: 4px;
+}
+
+.wab-overlay-min-btn:hover {
+  background: rgba(255, 107, 53, 0.25);
+  border-color: rgba(255, 107, 53, 0.5);
+  color: #ff6b35;
+}
+
+.wab-overlay-min-btn:active {
+  transform: scale(0.9);
+}
+
+/* ═══ NEW FIXED-SEQUENCE STRATEGY DISPLAY ═══ */
+.wab-seq-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  padding: 4px 2px;
+}
+.wab-seq-cell {
+  position: relative;
+  border-radius: 8px;
+  padding: 6px 2px 5px;
+  text-align: center;
+  border: 2px solid transparent;
+  background: rgba(255,255,255,.05);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.wab-seq-cell .wab-seq-num {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  opacity: .65;
+  margin-bottom: 2px;
+}
+.wab-seq-cell .wab-seq-val {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .3px;
+}
+.wab-seq-cell.small { background: rgba(96,165,250,.14); border-color: rgba(96,165,250,.35); color:#60a5fa; }
+.wab-seq-cell.big   { background: rgba(251,146,60,.14); border-color: rgba(251,146,60,.35); color:#fb923c; }
+.wab-seq-cell.small .wab-seq-num { color:#60a5fa; }
+.wab-seq-cell.big   .wab-seq-num { color:#fb923c; }
+/* Ongoing bet — highlighted + blinking */
+.wab-seq-cell.active {
+  transform: scale(1.08);
+  z-index: 2;
+  animation: wab-seq-blink 0.9s ease-in-out infinite;
+}
+.wab-seq-cell.active.small { box-shadow: 0 0 0 2px #60a5fa, 0 0 12px rgba(96,165,250,.7); border-color:#60a5fa; }
+.wab-seq-cell.active.big   { box-shadow: 0 0 0 2px #fb923c, 0 0 12px rgba(251,146,60,.7); border-color:#fb923c; }
+@keyframes wab-seq-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .45; }
+}
+.wab-seq-note {
+  font-size: 9px;
+  opacity: .6;
+  text-align: center;
+  margin-top: 5px;
+}

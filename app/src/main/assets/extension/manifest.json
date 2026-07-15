@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "TRADEX AUTO Pro",
+  "version": "2.0",
+  "description": "TRADEX AUTO Pro - Licensed auto bet assistant for WinGo game",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "webNavigation",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Auto TradeX Pro \u2014 Open Launcher"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "unblock",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "unblocker.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "ball_logo.jpg"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Auto TradeX Pro</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(160deg, #0d0d1a 0%, #111827 50%, #0a1628 100%);
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      padding-bottom: 100px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border-bottom: 1px solid rgba(255,107,53,0.25);
+      padding: 18px 20px 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, #ff6b35, #ff9500);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 900; color: #1a1a2e;
+      box-shadow: 0 0 16px rgba(255,107,53,0.45);
+    }
+    .header-title { font-size: 20px; font-weight: 800; color: #ff6b35; letter-spacing: 0.5px; }
+    .header-sub { font-size: 11px; color: #666; margin-top: 1px; }
+    .header-badge {
+      background: rgba(74,222,128,0.15);
+      border: 1px solid rgba(74,222,128,0.35);
+      color: #4ade80;
+      font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 20px;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 11px; font-weight: 700;
+      color: #555; text-transform: uppercase; letter-spacing: 1.5px;
+      padding: 22px 20px 10px;
+    }
+
+    /* ── Game Grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px;
+      padding: 16px 14px 14px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+    }
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--accent);
+      border-radius: 16px 16px 0 0;
+      opacity: 0.8;
+    }
+    .card:active { transform: scale(0.97); box-shadow: 0 0 20px var(--glow); }
+    .card:hover  { border-color: rgba(255,255,255,0.2); box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
+
+    .card-emoji { font-size: 30px; margin-bottom: 10px; display: block; }
+    .card-name  { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .card-domain{ font-size: 10px; color: #555; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--accent);
+      color: #fff; font-size: 12px; font-weight: 700;
+      padding: 6px 12px; border-radius: 20px;
+      opacity: 0.9;
+    }
+    .card-del {
+      position: absolute; top: 8px; right: 8px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(255,0,0,0.15); border: 1px solid rgba(255,0,0,0.3);
+      color: #f87171; font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; line-height: 1;
+    }
+    .card-del:active { background: rgba(255,0,0,0.35); }
+
+    /* ── Add Site FAB ── */
+    .fab {
+      position: fixed; bottom: 28px; right: 22px;
+      width: 58px; height: 58px;
+      background: linear-gradient(135deg, #ff6b35, #ff9500);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px; font-weight: 300; color: #fff;
+      box-shadow: 0 4px 24px rgba(255,107,53,0.55);
+      cursor: pointer;
+      z-index: 200;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .fab:active { transform: scale(0.92); box-shadow: 0 2px 12px rgba(255,107,53,0.4); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      z-index: 300;
+      align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: linear-gradient(160deg, #1a1a2e 0%, #111827 100%);
+      border: 1px solid rgba(255,107,53,0.3);
+      border-radius: 24px 24px 0 0;
+      padding: 24px 20px 36px;
+      width: 100%; max-width: 480px;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+    .modal-title { font-size: 18px; font-weight: 800; color: #ff6b35; margin-bottom: 6px; }
+    .modal-sub   { font-size: 12px; color: #666; margin-bottom: 20px; }
+    .modal label { font-size: 12px; color: #888; display: block; margin-bottom: 5px; font-weight: 600; letter-spacing: 0.5px; }
+    .modal input {
+      width: 100%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      color: #fff; font-size: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      outline: none;
+    }
+    .modal input:focus { border-color: #ff6b35; }
+    .modal input::placeholder { color: #444; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 4px; }
+    .modal-cancel {
+      flex: 1; padding: 13px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; color: #888;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .modal-save {
+      flex: 2; padding: 13px;
+      background: linear-gradient(135deg, #ff6b35, #ff9500);
+      border: none; border-radius: 12px;
+      color: #fff; font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    .modal-save:active { opacity: 0.85; }
+
+    /* ── Empty state ── */
+    .empty { text-align: center; padding: 30px 20px; color: #444; font-size: 13px; }
+
+    /* ── Tip bar ── */
+    .tip-bar {
+      margin: 20px 16px 0;
+      background: rgba(74,222,128,0.07);
+      border: 1px solid rgba(74,222,128,0.2);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 11px; color: #4ade80; line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-icon">W</div>
+      <div>
+        <div class="header-title">Auto TradeX Pro</div>
+        <div class="header-sub">Select a game to start</div>
+      </div>
+    </div>
+    <div class="header-badge">● READY</div>
+  </div>
+
+  <!-- Built-in Games -->
+  <div class="section-label">🎮 Game Sites</div>
+  <div class="grid" id="builtinGrid"></div>
+
+  <!-- Custom Games -->
+  <div class="section-label" id="customLabel" style="display:none">➕ My Added Sites</div>
+  <div class="grid" id="customGrid"></div>
+
+  <!-- Tip -->
+  <div class="tip-bar">
+    ⚡ Tap any game → the site opens and the Auto TradeX Pro panel loads automatically.<br>
+    ＋ Use the orange button (bottom-right) to add any new WinGo site.
+  </div>
+
+  <!-- FAB -->
+  <div class="fab" id="fabBtn" title="Add Site">＋</div>
+
+  <!-- Add Site Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-title">Add New Site</div>
+      <div class="modal-sub">Enter the name and URL of your WinGo game site</div>
+      <label>SITE NAME</label>
+      <input type="text" id="inputName" placeholder="e.g. My Club" maxlength="30">
+      <label>WEBSITE URL</label>
+      <input type="url" id="inputUrl" placeholder="https://example.com/#/" maxlength="200">
+      <div class="modal-btns">
+        <button class="modal-cancel" id="modalCancel">Cancel</button>
+        <button class="modal-save"   id="modalSave">Add Site →</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Built-in sites ─────────────────────────────────────────────────────────
+    const BUILTIN = [
+      { name: '91 Club',     url: 'https://www.kanpur91.com/#/',  emoji: '🎯', accent: '#f97316', glow: 'rgba(249,115,22,0.35)' },
+      { name: 'OK Win',      url: 'https://okwin06.com/#/',       emoji: '🏆', accent: '#eab308', glow: 'rgba(234,179,8,0.35)'  },
+      { name: 'BDG Win',     url: 'https://bdgwin901.com/#/',     emoji: '💰', accent: '#22c55e', glow: 'rgba(34,197,94,0.35)'  },
+      { name: 'BDG Game',    url: 'https://bdg793.com/#/',        emoji: '🎮', accent: '#3b82f6', glow: 'rgba(59,130,246,0.35)' },
+      { name: 'Daman',       url: 'https://0india.in/#/',         emoji: '🌟', accent: '#a855f7', glow: 'rgba(168,85,247,0.35)' },
+      { name: 'Jai Club',    url: 'https://jaiclub37.com/#/',     emoji: '🎪', accent: '#ec4899', glow: 'rgba(236,72,153,0.35)' },
+      { name: 'Jalwa Club',  url: 'https://www.a7jalx9.com/#/',  emoji: '💎', accent: '#06b6d4', glow: 'rgba(6,182,212,0.35)'  },
+    ];
+
+    // ── Render a card ──────────────────────────────────────────────────────────
+    function makeCard(site, isCustom = false) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.setProperty('--accent', site.accent || '#ff6b35');
+      card.style.setProperty('--glow',   site.glow   || 'rgba(255,107,53,0.3)');
+
+      const domain = (() => {
+        try { return new URL(site.url).hostname; } catch { return site.url; }
+      })();
+
+      card.innerHTML = `
+        <span class="card-emoji">${site.emoji || '🎲'}</span>
+        <div class="card-name">${site.name}</div>
+        <div class="card-domain">${domain}</div>
+        <div class="card-btn">Play ▶</div>
+        ${isCustom ? '<div class="card-del" data-del>✕</div>' : ''}
+      `;
+
+      // Open game
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('[data-del]')) return;
+        openSite(site.url);
+      });
+
+      // Delete custom
+      if (isCustom) {
+        card.querySelector('[data-del]').addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteCustomSite(site.url);
+        });
+      }
+      return card;
+    }
+
+    // ── Open a game site (navigates current tab) ───────────────────────────────
+    function openSite(url) {
+      if (typeof chrome !== 'undefined' && chrome.tabs) {
+        chrome.tabs.getCurrent(tab => {
+          if (tab) {
+            chrome.tabs.update(tab.id, { url });
+          } else {
+            chrome.tabs.create({ url });
+          }
+        });
+      } else {
+        window.location.href = url;
+      }
+    }
+
+    // ── Load & render custom sites ─────────────────────────────────────────────
+    function loadCustomSites(cb) {
+      if (typeof chrome !== 'undefined' && chrome.storage) {
+        chrome.storage.local.get('customSites', r => cb(r.customSites || []));
+      } else {
+        cb(JSON.parse(localStorage.getItem('customSites') || '[]'));
+      }
+    }
+    function saveCustomSites(sites, cb) {
+      if (typeof chrome !== 'undefined' && chrome.storage) {
+        chrome.storage.local.set({ customSites: sites }, cb);
+      } else {
+        localStorage.setItem('customSites', JSON.stringify(sites));
+        cb && cb();
+      }
+    }
+
+    function renderCustom(sites) {
+      const grid  = document.getElementById('customGrid');
+      const label = document.getElementById('customLabel');
+      grid.innerHTML = '';
+      if (!sites.length) { label.style.display = 'none'; return; }
+      label.style.display = '';
+      sites.forEach(s => grid.appendChild(makeCard(s, true)));
+    }
+
+    function deleteCustomSite(url) {
+      loadCustomSites(sites => {
+        const updated = sites.filter(s => s.url !== url);
+        saveCustomSites(updated, () => renderCustom(updated));
+      });
+    }
+
+    // ── Render built-in sites ─────────────────────────────────────────────────
+    const builtinGrid = document.getElementById('builtinGrid');
+    BUILTIN.forEach(s => builtinGrid.appendChild(makeCard(s, false)));
+
+    // ── Render custom sites on load ───────────────────────────────────────────
+    loadCustomSites(renderCustom);
+
+    // ── FAB & Modal ───────────────────────────────────────────────────────────
+    const overlay     = document.getElementById('modalOverlay');
+    const inputName   = document.getElementById('inputName');
+    const inputUrl    = document.getElementById('inputUrl');
+
+    document.getElementById('fabBtn').addEventListener('click', () => {
+      inputName.value = ''; inputUrl.value = '';
+      overlay.classList.add('open');
+      setTimeout(() => inputName.focus(), 250);
+    });
+    document.getElementById('modalCancel').addEventListener('click', () => {
+      overlay.classList.remove('open');
+    });
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+
+    document.getElementById('modalSave').addEventListener('click', () => {
+      const name = inputName.value.trim();
+      let   url  = inputUrl.value.trim();
+      if (!name || !url) { alert('Please fill in both fields.'); return; }
+      if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+      const COLORS = ['#f97316','#eab308','#22c55e','#3b82f6','#a855f7','#ec4899','#06b6d4','#ff6b35'];
+      const EMOJIS = ['🎲','🃏','🀄','🎰','🎳','🎯','🏅','⭐'];
+      const idx    = Math.floor(Math.random() * COLORS.length);
+      const site   = { name, url, emoji: EMOJIS[idx], accent: COLORS[idx], glow: `rgba(99,99,99,0.3)` };
+      loadCustomSites(sites => {
+        const updated = [...sites, site];
+        saveCustomSites(updated, () => {
+          renderCustom(updated);
+          overlay.classList.remove('open');
+        });
+      });
+    });
+
+    // Allow Enter key in modal
+    [inputName, inputUrl].forEach(inp => {
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('modalSave').click();
+      });
+    });
+  </script>
+</body>
+</html>
